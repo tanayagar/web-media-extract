@@ -33,8 +33,8 @@ async function getTweetData(url) {
                     const json = await response.json();
                     
                     // Save JSON to file
-                    await fs.writeFile('tweet_data.json', JSON.stringify(json, null, 2));
-                    console.log('Tweet data saved to tweet_data.json');
+                    // await fs.writeFile('tweet_data.json', JSON.stringify(json, null, 2));
+                    // console.log('Tweet data saved to tweet_data.json');
 
                     const tweetData = json.data.tweetResult.result.legacy;
                     textContent = tweetData.full_text.replace(/(https?:\/\/[^\s]+)/g, '<$1>');
@@ -44,7 +44,7 @@ async function getTweetData(url) {
                         mediaUrls = [];
                         media.forEach(item => {
                             if (item.type === 'photo') {
-                                mediaUrls.push(item.media_url_https);
+                                mediaUrls.push(item.media_url_https + '?name=orig');
                             } else if (item.type === 'video') {
                                 const variants = item.video_info.variants;
                                 const mp4Variants = variants.filter(v => v.content_type === 'video/mp4');
