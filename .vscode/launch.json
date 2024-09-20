@@ -5,7 +5,7 @@
         "type": "node",
         "request": "launch",
         "name": "Debug Bot",
-        "program": "${workspaceFolder}/fetch/test-twitter.js"
+        "program": "${workspaceFolder}/bot.js"
       }
     ]
   }

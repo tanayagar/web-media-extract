@@ -69,35 +69,29 @@ client.on('interactionCreate', async interaction => {
   if (commandName === 'hello') {
     await interaction.reply(`Hello, ${interaction.user.username}!`);
   } else if (commandName === 'embed') {
-    ////
     const url = interaction.options.getString('url');
-    await interaction.deferReply(); // Defer the reply as fetching tweet data might take some time
-
-    try {
-      const tweetData = await getTweetData(url);
-      await interaction.editReply({ content: `Tweet data:\n\`\`\`json\n${JSON.stringify(tweetData, null, 2)}\n\`\`\`` });
-    } catch (error) {
-      console.error('Error fetching tweet data:', error);
-      await interaction.editReply({ content: 'An error occurred while fetching the tweet data. Please try again.' });
-    }
-    ////
-    // const url = interaction.options.getString('url');
-    // const embedHolder = new EmbedHolder([url], "saklfjhasdklfjhasfkljasdhf");
+    const embedHolder = new EmbedHolder([url], "saklfjhasdklfjhasfkljasdhf");
     
-    // try {
-    //   const { content, files } = await createMessage(embedHolder);
-    //   await interaction.reply({ content, files });
-    // } catch (error) {
-    //   console.error('Error creating message:', error);
-    //   await interaction.reply({ content: 'An error occurred while creating the message. Please try again.', ephemeral: true });
-    // }
+    try {
+      const { content, files } = await createMessage(embedHolder);
+      await interaction.reply({ content, files });
+    } catch (error) {
+      console.error('Error creating message:', error);
+      await interaction.reply({ content: 'An error occurred while creating the message. Please try again.', ephemeral: true });
+    }
   } else if (commandName === 'twitter') {
     const url = interaction.options.getString('url');
     await interaction.deferReply(); // Defer the reply as fetching tweet data might take some time
 
     try {
-      const tweetData = await getTweetData(url);
-      await interaction.editReply({ content: `Tweet data:\n\`\`\`json\n${JSON.stringify(tweetData, null, 2)}\n\`\`\`` });
+      const embedHolder = await getTweetData(url);
+      
+      if (embedHolder.URLs.length > 0 || embedHolder.textContent) {
+        const { content, files } = await createMessage(embedHolder);
+        await interaction.editReply({ content, files });
+      } else {
+        await interaction.editReply('No media or text content found in the tweet.');
+      }
     } catch (error) {
       console.error('Error fetching tweet data:', error);
       await interaction.editReply({ content: 'An error occurred while fetching the tweet data. Please try again.' });

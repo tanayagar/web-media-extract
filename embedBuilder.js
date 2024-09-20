@@ -1,5 +1,4 @@
 import { AttachmentBuilder } from 'discord.js';
-import { fetchMediaUrls } from './fetch/test.js';
 import axios from 'axios';
 
 async function createMessage(embedHolder) {
@@ -11,19 +10,18 @@ async function createMessage(embedHolder) {
     content = `> ${embedHolder.textContent.replace(/\n/g, '\n> ')}`;
   }
 
-  // Fetch media for the first URL
+  // Include all images
   if (embedHolder.URLs.length > 0) {
-    const url = embedHolder.URLs[0];
-    const mediaUrls = await fetchMediaUrls(url);
-
-    // Always include an image (first media URL)
-    if (mediaUrls.length > 0) {
-      const mediaUrl = mediaUrls[0];
-      const response = await axios.get(mediaUrl, { responseType: 'arraybuffer' });
-      const buffer = Buffer.from(response.data, 'binary');
-      const fileName = `media${getFileExtension(mediaUrl)}`;
-      const attachment = new AttachmentBuilder(buffer, { name: fileName });
-      attachments.push(attachment);
+    for (const mediaUrl of embedHolder.URLs) {
+      try {
+        const response = await axios.get(mediaUrl, { responseType: 'arraybuffer' });
+        const buffer = Buffer.from(response.data, 'binary');
+        const fileName = `media${getFileExtension(mediaUrl)}`;
+        const attachment = new AttachmentBuilder(buffer, { name: fileName });
+        attachments.push(attachment);
+      } catch (error) {
+        console.error(`Error fetching image ${mediaUrl}:`, error);
+      }
     }
   }
 
