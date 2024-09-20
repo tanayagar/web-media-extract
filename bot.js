@@ -193,3 +193,9 @@ client.on('interactionCreate', async interaction => {
 });
 
 client.login(process.env.DISCORD_BOT_TOKEN);
+
+export default async function handler(request, response) {
+    // This function will be called by Vercel, but we don't need to do anything here
+    // as the bot is already running
+    response.status(200).json({ status: 'Bot is running' });
+  }
