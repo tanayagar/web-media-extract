@@ -98,32 +98,16 @@ client.on('interactionCreate', async interaction => {
   if (commandName === 'hello') {
     await interaction.reply(`Hello, ${interaction.user.username}!`);
   } else if (commandName === 'embed') {
-        const url = interaction.options.getString('url');
-    await interaction.deferReply();
-
-    try {
-      const embedHolder = await getInstagramData(url);
-      
-      if (embedHolder.URLs.length > 0 || embedHolder.textContent) {
-        const { content, files } = await createMessage(embedHolder);
-        await interaction.editReply({ content, files });
-      } else {
-        await interaction.editReply('No media or text content found in the Instagram post.');
-      }
-    } catch (error) {
-      console.error('Error fetching Instagram data:', error);
-      await interaction.editReply({ content: 'An error occurred while fetching the Instagram data. Please try again.' });
-    }
-    // const url = interaction.options.getString('url');
-    // const embedHolder = new EmbedHolder([url], "saklfjhasdklfjhasfkljasdhf");
+    const url = interaction.options.getString('url');
+    const embedHolder = new EmbedHolder([url], "saklfjhasdklfjhasfkljasdhf");
     
-    // try {
-    //   const { content, files } = await createMessage(embedHolder);
-    //   await interaction.reply({ content, files });
-    // } catch (error) {
-    //   console.error('Error creating message:', error);
-    //   await interaction.reply({ content: 'An error occurred while creating the message. Please try again.', ephemeral: true });
-    // }
+    try {
+      const { content, files } = await createMessage(embedHolder);
+      await interaction.reply({ content, files });
+    } catch (error) {
+      console.error('Error creating message:', error);
+      await interaction.reply({ content: 'An error occurred while creating the message. Please try again.', ephemeral: true });
+    }
   } else if (commandName === 'twitter') {
     const url = interaction.options.getString('url');
     await interaction.deferReply(); // Defer the reply as fetching tweet data might take some time
@@ -150,7 +134,15 @@ client.on('interactionCreate', async interaction => {
       
       if (embedHolder.URLs.length > 0 || embedHolder.textContent) {
         const { content, files } = await createMessage(embedHolder);
-        await interaction.editReply({ content, files });
+        
+        // Send the initial message with the text content
+        await interaction.editReply({ content });
+
+        // Send files in batches of 10
+        for (let i = 0; i < files.length; i += 10) {
+          const batch = files.slice(i, i + 10);
+          await interaction.followUp({ files: batch });
+        }
       } else {
         await interaction.editReply('No media or text content found in the Instagram post.');
       }

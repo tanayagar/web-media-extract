@@ -23,7 +23,6 @@ async function createMessage(embedHolder) {
         console.error(`Error fetching image ${mediaUrl}:`, error);
       }
     }
-
   }
 
   return { content, files: attachments };
